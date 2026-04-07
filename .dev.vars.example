@@ -1,0 +1,10 @@
+# Copia este archivo a .dev.vars y reemplaza los valores.
+MP_ACCESS_TOKEN=APP_USR-REEMPLAZAR_TOKEN
+ALLOWED_ORIGIN=https://jazzbb.manu.ar
+
+# Opcionales
+MP_CURRENCY_ID=ARS
+SUCCESS_URL=https://tu-dominio.com/?payment=success
+FAILURE_URL=https://tu-dominio.com/?payment=failure
+PENDING_URL=https://tu-dominio.com/?payment=pending
+# WEBHOOK_URL=https://tu-dominio.com/api/webhook

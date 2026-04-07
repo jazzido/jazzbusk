@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jazz en Cramer</title>
+    <meta
+      name="description"
+      content="Paga de forma segura con Mercado Pago. Selecciona un monto fijo y completa tu pago en segundos."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #F7585C;
+        --ink: #101010;
+        --muted: #272727;
+        --panel: #be3b2f;
+        --card: #f6f1e6;
+        --line: #101010;
+        --accent: #1a1a1a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "League Spartan", sans-serif;
+        color: var(--ink);
+        background-color: var(--paper);
+      }
+
+      .page {
+        min-height: 100vh;
+        display: grid;
+        align-items: start;
+        padding: 16px 14px 24px;
+      }
+
+      .card {
+        width: 100%;
+        background: transparent;
+        border: none;
+        padding: 0;
+        animation: reveal 440ms ease both;
+      }
+
+      .card-head {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .poster-stripe {
+        width: 100%;
+        height: 12px;
+        background: var(--ink);
+        margin-bottom: 12px;
+      }
+
+      .poster-stripe::after {
+        content: "";
+        display: block;
+        width: 28%;
+        height: 100%;
+        margin-left: auto;
+        background: var(--card);
+      }
+
+      .badge {
+        display: inline-flex;
+        width: fit-content;
+        margin: 0;
+        padding: 6px 10px;
+        border: 2px solid var(--line);
+        font-family: "Space Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: var(--card);
+      }
+
+      h1 {
+        margin: 0;
+        line-height: 0.84;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        font-size: clamp(2.6rem, 18vw, 8.8rem);
+        max-width: 8ch;
+        color: #111111;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.25;
+        max-width: none;
+        width: 100%;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      .payment-grid {
+        display: grid;
+        gap: 0;
+        border: 3px solid var(--line);
+      }
+
+      .custom-payment {
+        margin: 10px 0 0 0px;
+        border: 3px solid var(--line);
+        background: var(--card);
+        padding: 12px;
+      }
+
+      .custom-payment-title {
+        margin: 0 0 10px;
+        font-size: 0.78rem;
+        font-family: "Space Mono", monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .custom-payment-form {
+        display: grid;
+        gap: 8px;
+      }
+
+      .amount-input-wrap {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        border: 2px solid var(--line);
+        min-height: 56px;
+      }
+
+      .amount-prefix {
+        display: grid;
+        place-items: center;
+        width: 52px;
+        border-right: 2px solid var(--line);
+        font-weight: 900;
+        font-size: 1.3rem;
+      }
+
+      .amount-input {
+        border: none;
+        background: transparent;
+        width: 100%;
+        font: inherit;
+        font-size: 1.7rem;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+        padding: 8px 10px;
+      }
+
+      .amount-input:focus {
+        outline: none;
+      }
+
+      .custom-pay-btn {
+        appearance: none;
+        border: 2px solid var(--line);
+        background: var(--ink);
+        color: #fff;
+        text-transform: uppercase;
+        font-family: "Space Mono", monospace;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+        padding: 11px 12px;
+        cursor: pointer;
+      }
+
+      .custom-pay-btn:hover,
+      .custom-pay-btn:focus-visible {
+        background: var(--panel);
+      }
+
+      .custom-pay-btn[disabled] {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+
+      .custom-payment-help {
+        margin: 8px 0 0;
+        min-height: 1.1em;
+        font-family: "Space Mono", monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .transfer-note {
+        margin: 10px 0 0;
+        border: 3px solid var(--line);
+        background: var(--card);
+        padding: 12px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.74rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .alias-highlight {
+        display: inline-block;
+        background: #101010;
+        color: #ffffff;
+        padding: 2px 6px;
+        line-height: 1;
+      }
+
+      .payment-btn {
+        appearance: none;
+        border: none;
+        border-bottom: 3px solid var(--line);
+        cursor: pointer;
+        text-align: left;
+        width: 100%;
+        padding: 16px 14px 14px;
+        background: var(--card);
+        color: var(--ink);
+        transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
+        position: relative;
+      }
+
+      .payment-btn:last-child {
+        border-bottom: none;
+      }
+
+      .payment-btn:hover,
+      .payment-btn:focus-visible {
+        background: var(--accent);
+        color: #ffffff;
+        transform: translateX(4px);
+        outline: 2px solid var(--line);
+        outline-offset: 2px;
+      }
+
+      .payment-btn:active {
+        transform: translateY(0);
+      }
+
+      .payment-btn .label {
+        display: block;
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+
+      .payment-btn .amount {
+        display: block;
+        font-weight: 900;
+        letter-spacing: 0.02em;
+        font-size: 2rem;
+      }
+
+      .payment-btn::after {
+        content: "0" counter(option);
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        opacity: 0.7;
+      }
+
+      .payment-grid {
+        counter-reset: option;
+      }
+
+      .payment-btn {
+        counter-increment: option;
+      }
+
+      .footer-note {
+        margin: 10px 0 0;
+        font-size: 0.68rem;
+        font-family: "Space Mono", monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink);
+        border-top: 2px solid var(--line);
+        padding-top: 10px;
+      }
+
+      @media (min-width: 720px) {
+        .page {
+          padding: 26px 24px 32px;
+        }
+
+        .card-head {
+          grid-template-columns: 1.35fr 0.65fr;
+          align-items: start;
+          column-gap: 24px;
+        }
+
+        .subtitle {
+          text-align: left;
+          max-width: none;
+          margin-left: 0;
+          margin-top: 6px;
+          grid-column: 1 / -1;
+        }
+
+        .payment-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          border-bottom: 0;
+        }
+
+        .custom-payment-form {
+          grid-template-columns: 1fr auto;
+          align-items: stretch;
+        }
+
+        .custom-pay-btn {
+          min-width: 240px;
+        }
+
+        .payment-btn {
+          min-height: 165px;
+          border-bottom: 0;
+          border-right: 3px solid var(--line);
+        }
+
+        .payment-btn:last-child {
+          border-right: 0;
+        }
+      }
+
+      @keyframes reveal {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="card" aria-labelledby="titulo-pagos">
+        <div class="poster-stripe" aria-hidden="true"></div>
+        <div class="card-head">
+          <div>
+            <h1 id="titulo-pagos">Jazz en Cramer</h1>
+          </div>
+          <p class="subtitle">
+            Gracias por apoyarnos! Elegí un aporte y completá el pago seguro con Mercado Pago.
+          </p>
+          <p class="subtitle">
+            Si preferís, podés hacer una transferencia al alias <span class="alias-highlight">JAZZBB</span>.
+          </p>
+          
+        </div>
+
+        <div class="payment-grid" id="payment-grid" aria-live="polite"></div>
+
+        <section class="custom-payment" aria-labelledby="custom-payment-title">
+          <h2 class="custom-payment-title" id="custom-payment-title">Elegí el monto de tu aporte</h2>
+          <form class="custom-payment-form" id="custom-payment-form">
+            <label class="amount-input-wrap" for="custom-amount">
+              <span class="amount-prefix">$</span>
+              <input
+                id="custom-amount"
+                class="amount-input"
+                type="number"
+                inputmode="numeric"
+                min="100"
+                step="1"
+                placeholder="Ej: 6500"
+                required
+              />
+            </label>
+            <button class="custom-pay-btn" id="custom-pay-btn" type="submit">Ir a Mercado Pago</button>
+          </form>
+          <p class="custom-payment-help" id="custom-payment-help" aria-live="polite"></p>
+        </section>
+
+        <p class="footer-note">
+          Al continuar, el pago se procesa en la plataforma oficial de Mercado Pago.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const WORKER_URL = "https://jazzbusk-payments.jazzbb.workers.dev";
+
+      const paymentOptions = [
+        {
+          amount: 20000,
+          label: "Aporte completo",
+        },
+        {
+          amount: 10000,
+          label: "Aporte intermedio",
+        },
+        {
+          amount: 5000,
+          label: "Aporte base",
+        },
+      ];
+
+      const MIN_AMOUNT = 100;
+      const MAX_AMOUNT = 10000000;
+
+      const currencyFormatter = new Intl.NumberFormat("es-AR", {
+        style: "currency",
+        currency: "ARS",
+        maximumFractionDigits: 0,
+      });
+
+      const paymentGrid = document.getElementById("payment-grid");
+      const customPaymentForm = document.getElementById("custom-payment-form");
+      const customAmountInput = document.getElementById("custom-amount");
+      const customPayBtn = document.getElementById("custom-pay-btn");
+      const customPaymentHelp = document.getElementById("custom-payment-help");
+
+      function setCustomHelpMessage(message) {
+        customPaymentHelp.textContent = message;
+      }
+
+      function setCustomLoadingState(isLoading) {
+        customPayBtn.disabled = isLoading;
+        customPayBtn.textContent = isLoading ? "Creando pago..." : "Pagar monto libre";
+      }
+
+      function isAmountValid(amount) {
+        return Number.isFinite(amount) && amount >= MIN_AMOUNT && amount <= MAX_AMOUNT;
+      }
+
+      async function createPreferenceAndRedirect(amount, label) {
+        const response = await fetch(`${WORKER_URL}/api/create-preference`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ amount, label }),
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          throw new Error(errorBody.error || "No se pudo crear el pago.");
+        }
+
+        const data = await response.json();
+
+        if (!data.checkoutUrl) {
+          throw new Error("La respuesta no incluye una URL de checkout.");
+        }
+
+        window.location.href = data.checkoutUrl;
+      }
+
+      function createPaymentButton(option) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "payment-btn";
+        button.setAttribute("aria-label", `Pagar ${currencyFormatter.format(option.amount)} con Mercado Pago`);
+
+        button.innerHTML = `
+          <span class="label">${option.label}</span>
+          <span class="amount">${currencyFormatter.format(option.amount)}</span>
+        `;
+
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          const previousHtml = button.innerHTML;
+          button.innerHTML = `<span class="label">Procesando</span><span class="amount">...</span>`;
+
+          try {
+            await createPreferenceAndRedirect(option.amount, option.label);
+          } catch (error) {
+            alert(error instanceof Error ? error.message : "No se pudo iniciar el pago.");
+            button.innerHTML = previousHtml;
+            button.disabled = false;
+          }
+        });
+
+        return button;
+      }
+
+      function renderPaymentButtons() {
+        paymentOptions.forEach((option) => {
+          paymentGrid.appendChild(createPaymentButton(option));
+        });
+      }
+
+      async function handleCustomPaymentSubmit(event) {
+        event.preventDefault();
+
+        const amount = Number(customAmountInput.value);
+
+        if (!isAmountValid(amount)) {
+          setCustomHelpMessage(`Ingresa un monto valido entre ${currencyFormatter.format(MIN_AMOUNT)} y ${currencyFormatter.format(MAX_AMOUNT)}.`);
+          return;
+        }
+
+        setCustomHelpMessage("");
+        setCustomLoadingState(true);
+
+        try {
+          await createPreferenceAndRedirect(amount, "Aporte libre");
+        } catch (error) {
+          setCustomHelpMessage(error instanceof Error ? error.message : "No se pudo iniciar el pago.");
+          setCustomLoadingState(false);
+        }
+      }
+
+      customPaymentForm.addEventListener("submit", handleCustomPaymentSubmit);
+
+      renderPaymentButtons();
+    </script>
+  </body>
+</html>

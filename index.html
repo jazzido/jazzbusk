@@ -74,19 +74,6 @@
         background: var(--card);
       }
 
-      .badge {
-        display: inline-flex;
-        width: fit-content;
-        margin: 0;
-        padding: 6px 10px;
-        border: 2px solid var(--line);
-        font-family: "Space Mono", monospace;
-        font-size: 0.72rem;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        background: var(--card);
-      }
-
       h1 {
         margin: 0;
         line-height: 0.84;
@@ -99,6 +86,7 @@
 
       .subtitle {
         margin: 0;
+        margin-top: 6px;
         color: var(--muted);
         font-size: 0.88rem;
         line-height: 1.25;
@@ -113,7 +101,6 @@
         border: 3px solid var(--line);
         background: var(--card);
         padding: 10px 12px;
-        font-family: "Space Mono", monospace;
         font-size: 0.72rem;
         letter-spacing: 0.05em;
         text-transform: uppercase;
@@ -121,6 +108,17 @@
 
       .redirect-result {
         margin-top: 10px;
+      }
+
+      .back-link {
+        display: block;
+        margin-top: 10px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-align: center;
+        color: var(--ink);
       }
 
       .payment-status[data-status="success"] {
@@ -139,10 +137,11 @@
         display: grid;
         gap: 0;
         border: 3px solid var(--line);
+        margin: 10px 0 0 0;
       }
 
       .custom-payment {
-        margin: 10px 0 0 0px;
+        margin: 10px 0 0;
         border: 3px solid var(--line);
         background: var(--card);
         padding: 12px;
@@ -151,7 +150,6 @@
       .custom-payment-title {
         margin: 0 0 10px;
         font-size: 0.78rem;
-        font-family: "Space Mono", monospace;
         letter-spacing: 0.1em;
         text-transform: uppercase;
       }
@@ -198,7 +196,6 @@
         background: var(--ink);
         color: #fff;
         text-transform: uppercase;
-        font-family: "Space Mono", monospace;
         letter-spacing: 0.08em;
         font-weight: 700;
         padding: 11px 12px;
@@ -218,27 +215,15 @@
       .custom-payment-help {
         margin: 8px 0 0;
         min-height: 1.1em;
-        font-family: "Space Mono", monospace;
         font-size: 0.68rem;
         letter-spacing: 0.05em;
         text-transform: uppercase;
       }
 
-      .transfer-note {
-        margin: 10px 0 0;
-        border: 3px solid var(--line);
-        background: var(--card);
-        padding: 12px;
-        font-family: "Space Mono", monospace;
-        font-size: 0.74rem;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-      }
-
       .alias-highlight {
         display: inline-block;
-        background: #101010;
-        color: #ffffff;
+        background: var(--ink);
+        color: #fff;
         padding: 2px 6px;
         line-height: 1;
       }
@@ -247,6 +232,7 @@
         appearance: none;
         border: none;
         border-bottom: 3px solid var(--line);
+        counter-increment: option;
         cursor: pointer;
         text-align: left;
         width: 100%;
@@ -279,7 +265,6 @@
 
       .payment-btn .label {
         display: block;
-        font-family: "Space Mono", monospace;
         font-size: 0.7rem;
         letter-spacing: 0.13em;
         text-transform: uppercase;
@@ -298,29 +283,29 @@
         position: absolute;
         top: 8px;
         right: 10px;
-        font-family: "Space Mono", monospace;
         font-size: 0.72rem;
         letter-spacing: 0.08em;
         opacity: 0.7;
       }
 
-      .payment-grid {
-        counter-reset: option;
-      }
-
-      .payment-btn {
-        counter-increment: option;
-      }
-
       .footer-note {
         margin: 10px 0 0;
         font-size: 0.68rem;
-        font-family: "Space Mono", monospace;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--ink);
         border-top: 2px solid var(--line);
         padding-top: 10px;
+      }
+
+      .payment-status,
+      .custom-payment-title,
+      .custom-pay-btn,
+      .custom-payment-help,
+      .payment-btn .label,
+      .payment-btn::after,
+      .footer-note {
+        font-family: "Space Mono", monospace;
       }
 
       @media (min-width: 720px) {
@@ -335,9 +320,6 @@
         }
 
         .subtitle {
-          text-align: left;
-          max-width: none;
-          margin-left: 0;
           margin-top: 6px;
           grid-column: 1 / -1;
         }
@@ -345,6 +327,7 @@
         .payment-grid {
           grid-template-columns: repeat(3, minmax(0, 1fr));
           border-bottom: 0;
+          counter-reset: option;
         }
 
         .custom-payment-form {
@@ -380,16 +363,30 @@
     </style>
   </head>
   <body>
+    <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+      <symbol id="icon-whatsapp" viewBox="0 0 256 256">
+        <g transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+          <path fill="currentColor" fill-rule="evenodd" d="M 76.735 13.079 C 68.315 4.649 57.117 0.005 45.187 0 C 20.605 0 0.599 20.005 0.589 44.594 c -0.003 7.86 2.05 15.532 5.953 22.296 L 0.215 90 l 23.642 -6.202 c 6.514 3.553 13.848 5.426 21.312 5.428 h 0.018 c 0.001 0 -0.001 0 0 0 c 24.579 0 44.587 -20.007 44.597 -44.597 C 89.789 32.713 85.155 21.509 76.735 13.079 z M 27.076 46.217 c -0.557 -0.744 -4.55 -6.042 -4.55 -11.527 c 0 -5.485 2.879 -8.181 3.9 -9.296 c 1.021 -1.115 2.229 -1.394 2.972 -1.394 s 1.487 0.007 2.136 0.039 c 0.684 0.035 1.603 -0.26 2.507 1.913 c 0.929 2.231 3.157 7.717 3.436 8.274 c 0.279 0.558 0.464 1.208 0.093 1.952 c -0.371 0.743 -0.557 1.208 -1.114 1.859 c -0.557 0.651 -1.17 1.453 -1.672 1.952 c -0.558 0.556 -1.139 1.159 -0.489 2.274 c 0.65 1.116 2.886 4.765 6.199 7.72 c 4.256 3.797 7.847 4.973 8.961 5.531 c 1.114 0.558 1.764 0.465 2.414 -0.279 c 0.65 -0.744 2.786 -3.254 3.529 -4.369 c 0.743 -1.115 1.486 -0.929 2.507 -0.558 c 1.022 0.372 6.5 3.068 7.614 3.625 c 1.114 0.558 1.857 0.837 2.136 1.302 c 0.279 0.465 0.279 2.696 -0.65 5.299 c -0.929 2.603 -5.381 4.979 -7.522 5.298 c -1.92 0.287 -4.349 0.407 -7.019 -0.442 c -1.618 -0.513 -3.694 -1.199 -6.353 -2.347 C 34.934 58.216 27.634 46.961 27.076 46.217 z"/>
+        </g>
+      </symbol>
+    </svg>
+
     <main class="page">
       <section class="card" aria-labelledby="titulo-pagos">
         <div class="poster-stripe" aria-hidden="true"></div>
-        <section class="redirect-result" id="redirect-result" hidden>
-          <p class="payment-status" id="payment-status" aria-live="polite"></p>
-        </section>
         <div class="card-head">
           <div>
             <h1 id="titulo-pagos">Jazz en Cramer</h1>
           </div>
+        </div>
+
+        <section class="redirect-result" id="redirect-result" hidden>
+          <p class="payment-status" id="payment-status" aria-live="polite"></p>
+          <a class="back-link" href="/">Volver al inicio</a>
+        </section>
+
+
+        <div id="initial-interface">
           <p class="subtitle">
             Gracias por apoyarnos! Elegí un aporte y completá el pago seguro con
             Mercado Pago.
@@ -398,9 +395,7 @@
             Si preferís, podés hacer una transferencia al alias
             <span class="alias-highlight">JAZZBB</span>.
           </p>
-        </div>
 
-        <div id="initial-interface">
           <div class="payment-grid" id="payment-grid" aria-live="polite"></div>
 
           <section
@@ -424,7 +419,7 @@
                   required
                 />
               </label>
-              <button class="custom-pay-btn" id="custom-pay-btn" type="submit">
+              <button class="custom-pay-btn" id="custom-pay-btn" type="submit" disabled>
                 Ir a Mercado Pago
               </button>
             </form>
@@ -436,22 +431,23 @@
           </section>
 
           <p class="footer-note">
-            Al continuar, el pago se procesa en la plataforma oficial de Mercado
-            Pago.
+            Sumate a <a href="https://chat.whatsapp.com/HJ9d9MuvjIV7rrOHNu0iuq?mode=gi_t"><b><svg width="10" height="10" aria-hidden="true" style="display:inline;vertical-align:middle"><use href="#icon-whatsapp"/></svg> 291 JAZZ</b></a> para enterarte de toda la actividad jazzística en Bahía.
           </p>
         </div>
       </section>
     </main>
 
-    <template id="payment-template-success"
-      >Pago aprobado. Gracias por tu aporte.</template
-    >
-    <template id="payment-template-failure"
-      >El pago no se pudo completar. Podés intentarlo nuevamente.</template
-    >
-    <template id="payment-template-pending"
-      >Pago pendiente. Mercado Pago te avisará cuando se acredite.</template
-    >
+    <template id="payment-template-success">
+      <p>Pago aprobado. Gracias por tu aporte.</p>
+      <p>Si te interesa enterarte de toda la actividad jazzística en Bahía, sumate en WhatsApp al <a href="https://chat.whatsapp.com/HJ9d9MuvjIV7rrOHNu0iuq?mode=gi_t"><b><svg width="10" height="10" aria-hidden="true" style="display:inline;vertical-align:middle"><use href="#icon-whatsapp"/></svg> 291 JAZZ</b></a></p>
+      <p>Nos vemos la próxima fecha!</p>
+    </template>
+    <template id="payment-template-failure">
+      El pago no se pudo completar. Podés intentarlo nuevamente.
+    </template>
+    <template id="payment-template-pending">
+      Pago pendiente. Mercado Pago te avisará cuando se acredite.
+    </template>
 
     <script>
       const WORKER_URL = "https://jazzbusk-payments.jazzbb.workers.dev";
@@ -637,6 +633,9 @@
       const isRedirectFlow = renderPaymentRedirectStatus();
 
       if (!isRedirectFlow) {
+        customAmountInput.addEventListener("input", () => {
+          customPayBtn.disabled = !isAmountValid(Number(customAmountInput.value));
+        });
         customPaymentForm.addEventListener("submit", handleCustomPaymentSubmit);
         renderPaymentButtons();
       }

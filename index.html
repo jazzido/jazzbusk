@@ -16,7 +16,7 @@
     />
     <style>
       :root {
-        --paper: #F7585C;
+        --paper: #f7585c;
         --ink: #101010;
         --muted: #272727;
         --panel: #be3b2f;
@@ -106,6 +106,33 @@
         width: 100%;
         text-transform: uppercase;
         font-weight: 700;
+      }
+
+      .payment-status {
+        margin: 0;
+        border: 3px solid var(--line);
+        background: var(--card);
+        padding: 10px 12px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .redirect-result {
+        margin-top: 10px;
+      }
+
+      .payment-status[data-status="success"] {
+        background: #d8ffd8;
+      }
+
+      .payment-status[data-status="failure"] {
+        background: #ffd9d9;
+      }
+
+      .payment-status[data-status="pending"] {
+        background: #fff5cc;
       }
 
       .payment-grid {
@@ -226,7 +253,10 @@
         padding: 16px 14px 14px;
         background: var(--card);
         color: var(--ink);
-        transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
+        transition:
+          transform 120ms ease,
+          background-color 120ms ease,
+          color 120ms ease;
         position: relative;
       }
 
@@ -353,47 +383,75 @@
     <main class="page">
       <section class="card" aria-labelledby="titulo-pagos">
         <div class="poster-stripe" aria-hidden="true"></div>
+        <section class="redirect-result" id="redirect-result" hidden>
+          <p class="payment-status" id="payment-status" aria-live="polite"></p>
+        </section>
         <div class="card-head">
           <div>
             <h1 id="titulo-pagos">Jazz en Cramer</h1>
           </div>
           <p class="subtitle">
-            Gracias por apoyarnos! Elegí un aporte y completá el pago seguro con Mercado Pago.
+            Gracias por apoyarnos! Elegí un aporte y completá el pago seguro con
+            Mercado Pago.
           </p>
           <p class="subtitle">
-            Si preferís, podés hacer una transferencia al alias <span class="alias-highlight">JAZZBB</span>.
+            Si preferís, podés hacer una transferencia al alias
+            <span class="alias-highlight">JAZZBB</span>.
           </p>
-          
         </div>
 
-        <div class="payment-grid" id="payment-grid" aria-live="polite"></div>
+        <div id="initial-interface">
+          <div class="payment-grid" id="payment-grid" aria-live="polite"></div>
 
-        <section class="custom-payment" aria-labelledby="custom-payment-title">
-          <h2 class="custom-payment-title" id="custom-payment-title">Elegí el monto de tu aporte</h2>
-          <form class="custom-payment-form" id="custom-payment-form">
-            <label class="amount-input-wrap" for="custom-amount">
-              <span class="amount-prefix">$</span>
-              <input
-                id="custom-amount"
-                class="amount-input"
-                type="number"
-                inputmode="numeric"
-                min="100"
-                step="1"
-                placeholder="Ej: 6500"
-                required
-              />
-            </label>
-            <button class="custom-pay-btn" id="custom-pay-btn" type="submit">Ir a Mercado Pago</button>
-          </form>
-          <p class="custom-payment-help" id="custom-payment-help" aria-live="polite"></p>
-        </section>
+          <section
+            class="custom-payment"
+            aria-labelledby="custom-payment-title"
+          >
+            <h2 class="custom-payment-title" id="custom-payment-title">
+              Elegí el monto de tu aporte
+            </h2>
+            <form class="custom-payment-form" id="custom-payment-form">
+              <label class="amount-input-wrap" for="custom-amount">
+                <span class="amount-prefix">$</span>
+                <input
+                  id="custom-amount"
+                  class="amount-input"
+                  type="number"
+                  inputmode="numeric"
+                  min="100"
+                  step="1"
+                  placeholder="Ej: 6500"
+                  required
+                />
+              </label>
+              <button class="custom-pay-btn" id="custom-pay-btn" type="submit">
+                Ir a Mercado Pago
+              </button>
+            </form>
+            <p
+              class="custom-payment-help"
+              id="custom-payment-help"
+              aria-live="polite"
+            ></p>
+          </section>
 
-        <p class="footer-note">
-          Al continuar, el pago se procesa en la plataforma oficial de Mercado Pago.
-        </p>
+          <p class="footer-note">
+            Al continuar, el pago se procesa en la plataforma oficial de Mercado
+            Pago.
+          </p>
+        </div>
       </section>
     </main>
+
+    <template id="payment-template-success"
+      >Pago aprobado. Gracias por tu aporte.</template
+    >
+    <template id="payment-template-failure"
+      >El pago no se pudo completar. Podés intentarlo nuevamente.</template
+    >
+    <template id="payment-template-pending"
+      >Pago pendiente. Mercado Pago te avisará cuando se acredite.</template
+    >
 
     <script>
       const WORKER_URL = "https://jazzbusk-payments.jazzbb.workers.dev";
@@ -422,11 +480,49 @@
         maximumFractionDigits: 0,
       });
 
+      const initialInterface = document.getElementById("initial-interface");
+      const redirectResult = document.getElementById("redirect-result");
       const paymentGrid = document.getElementById("payment-grid");
+      const paymentStatus = document.getElementById("payment-status");
       const customPaymentForm = document.getElementById("custom-payment-form");
       const customAmountInput = document.getElementById("custom-amount");
       const customPayBtn = document.getElementById("custom-pay-btn");
       const customPaymentHelp = document.getElementById("custom-payment-help");
+
+      function renderPaymentRedirectStatus() {
+        const searchParams = new URLSearchParams(window.location.search);
+        const rawStatus = (searchParams.get("payment") || "").toLowerCase();
+
+        if (!rawStatus) {
+          redirectResult.hidden = true;
+          initialInterface.hidden = false;
+          return false;
+        }
+
+        const normalizedStatus =
+          rawStatus === "panding" ? "pending" : rawStatus;
+
+        const templateMap = {
+          success: "payment-template-success",
+          failure: "payment-template-failure",
+          pending: "payment-template-pending",
+        };
+
+        const templateId = templateMap[normalizedStatus];
+
+        if (!templateId) {
+          redirectResult.hidden = true;
+          initialInterface.hidden = false;
+          return false;
+        }
+
+        const template = document.getElementById(templateId);
+        paymentStatus.replaceChildren(template.content.cloneNode(true));
+        paymentStatus.dataset.status = normalizedStatus;
+        initialInterface.hidden = true;
+        redirectResult.hidden = false;
+        return true;
+      }
 
       function setCustomHelpMessage(message) {
         customPaymentHelp.textContent = message;
@@ -434,11 +530,17 @@
 
       function setCustomLoadingState(isLoading) {
         customPayBtn.disabled = isLoading;
-        customPayBtn.textContent = isLoading ? "Creando pago..." : "Pagar monto libre";
+        customPayBtn.textContent = isLoading
+          ? "Creando pago..."
+          : "Pagar monto libre";
       }
 
       function isAmountValid(amount) {
-        return Number.isFinite(amount) && amount >= MIN_AMOUNT && amount <= MAX_AMOUNT;
+        return (
+          Number.isFinite(amount) &&
+          amount >= MIN_AMOUNT &&
+          amount <= MAX_AMOUNT
+        );
       }
 
       async function createPreferenceAndRedirect(amount, label) {
@@ -468,7 +570,10 @@
         const button = document.createElement("button");
         button.type = "button";
         button.className = "payment-btn";
-        button.setAttribute("aria-label", `Pagar ${currencyFormatter.format(option.amount)} con Mercado Pago`);
+        button.setAttribute(
+          "aria-label",
+          `Pagar ${currencyFormatter.format(option.amount)} con Mercado Pago`,
+        );
 
         button.innerHTML = `
           <span class="label">${option.label}</span>
@@ -483,7 +588,11 @@
           try {
             await createPreferenceAndRedirect(option.amount, option.label);
           } catch (error) {
-            alert(error instanceof Error ? error.message : "No se pudo iniciar el pago.");
+            alert(
+              error instanceof Error
+                ? error.message
+                : "No se pudo iniciar el pago.",
+            );
             button.innerHTML = previousHtml;
             button.disabled = false;
           }
@@ -504,7 +613,9 @@
         const amount = Number(customAmountInput.value);
 
         if (!isAmountValid(amount)) {
-          setCustomHelpMessage(`Ingresa un monto valido entre ${currencyFormatter.format(MIN_AMOUNT)} y ${currencyFormatter.format(MAX_AMOUNT)}.`);
+          setCustomHelpMessage(
+            `Ingresa un monto valido entre ${currencyFormatter.format(MIN_AMOUNT)} y ${currencyFormatter.format(MAX_AMOUNT)}.`,
+          );
           return;
         }
 
@@ -514,14 +625,21 @@
         try {
           await createPreferenceAndRedirect(amount, "Aporte libre");
         } catch (error) {
-          setCustomHelpMessage(error instanceof Error ? error.message : "No se pudo iniciar el pago.");
+          setCustomHelpMessage(
+            error instanceof Error
+              ? error.message
+              : "No se pudo iniciar el pago.",
+          );
           setCustomLoadingState(false);
         }
       }
 
-      customPaymentForm.addEventListener("submit", handleCustomPaymentSubmit);
+      const isRedirectFlow = renderPaymentRedirectStatus();
 
-      renderPaymentButtons();
+      if (!isRedirectFlow) {
+        customPaymentForm.addEventListener("submit", handleCustomPaymentSubmit);
+        renderPaymentButtons();
+      }
     </script>
   </body>
 </html>

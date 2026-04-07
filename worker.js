@@ -6,7 +6,7 @@ function corsHeaders(env) {
   };
 }
 
-function jsonResponse(body, status = 200) {
+function jsonResponse(body, env, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
@@ -54,6 +54,7 @@ async function createPreference(request, env) {
       {
         error: "Falta configurar MP_ACCESS_TOKEN en las variables secretas del Worker.",
       },
+      env,
       500,
     );
   }
@@ -62,14 +63,14 @@ async function createPreference(request, env) {
   try {
     body = await request.json();
   } catch {
-    return jsonResponse({ error: "Body JSON invalido." }, 400);
+    return jsonResponse({ error: "Body JSON invalido." }, env, 400);
   }
 
   const amount = Number(body?.amount);
   const label = typeof body?.label === "string" && body.label.trim() ? body.label.trim() : "Aporte JazzBusk";
 
   if (!Number.isFinite(amount) || amount < 100 || amount > 10000000) {
-    return jsonResponse({ error: "Monto invalido. Rango permitido: 100 a 10000000." }, 400);
+    return jsonResponse({ error: "Monto invalido. Rango permitido: 100 a 10000000." }, env, 400);
   }
 
   const payload = buildMercadoPagoPayload(amount, label, env, new URL(request.url));
@@ -91,6 +92,7 @@ async function createPreference(request, env) {
         error: "Mercado Pago rechazo la creacion de la preferencia.",
         details: mpData,
       },
+      env,
       502,
     );
   }
@@ -103,14 +105,18 @@ async function createPreference(request, env) {
         error: "Mercado Pago no devolvio una URL de checkout.",
         details: mpData,
       },
+      env,
       502,
     );
   }
 
-  return jsonResponse({
-    id: mpData.id,
-    checkoutUrl,
-  });
+  return jsonResponse(
+    {
+      id: mpData.id,
+      checkoutUrl,
+    },
+    env,
+  );
 }
 
 export default {

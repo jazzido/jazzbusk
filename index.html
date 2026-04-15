@@ -98,12 +98,16 @@
         margin: 0;
         margin-top: 6px;
         color: var(--muted);
-        font-size: 0.88rem;
+        font-size: 0.96rem;
         line-height: 1.25;
         max-width: none;
         width: 100%;
         text-transform: uppercase;
         font-weight: 700;
+      }
+
+      #titulo-pagos {
+        font-size: clamp(2.45rem, 17vw, 8.2rem);
       }
 
       .payment-status {
@@ -403,7 +407,7 @@
           </p>
           <p class="subtitle">
             Si preferís, podés hacer una transferencia al alias
-            <span class="alias-highlight">JAZZBB</span>.
+            <span class="alias-highlight">JAZZBB</span>
           </p>
 
           <div class="payment-grid" id="payment-grid" aria-live="polite"></div>

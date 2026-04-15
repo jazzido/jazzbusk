@@ -17,11 +17,34 @@ function jsonResponse(body, env, status = 200) {
   });
 }
 
+function buildReturnUrl(baseUrl, status, amount, label) {
+  const url = new URL(baseUrl);
+  url.searchParams.set("payment", status);
+  url.searchParams.set("amount", String(amount));
+  url.searchParams.set("label", label);
+  return url.toString();
+}
+
 function buildMercadoPagoPayload(amount, label, env, requestUrl) {
   const origin = requestUrl.origin;
-  const successUrl = env.SUCCESS_URL || `${origin}/?payment=success`;
-  const failureUrl = env.FAILURE_URL || `${origin}/?payment=failure`;
-  const pendingUrl = env.PENDING_URL || `${origin}/?payment=pending`;
+  const successUrl = buildReturnUrl(
+    env.SUCCESS_URL || `${origin}/`,
+    "success",
+    amount,
+    label,
+  );
+  const failureUrl = buildReturnUrl(
+    env.FAILURE_URL || `${origin}/`,
+    "failure",
+    amount,
+    label,
+  );
+  const pendingUrl = buildReturnUrl(
+    env.PENDING_URL || `${origin}/`,
+    "pending",
+    amount,
+    label,
+  );
 
   const payload = {
     items: [

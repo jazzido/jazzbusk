@@ -505,6 +505,14 @@
       const customPayBtn = document.getElementById("custom-pay-btn");
       const customPaymentHelp = document.getElementById("custom-payment-help");
 
+      function trackEvent(eventName, params = {}) {
+        if (typeof window.gtag !== "function") {
+          return;
+        }
+
+        window.gtag("event", eventName, params);
+      }
+
       function renderPaymentRedirectStatus() {
         const searchParams = new URLSearchParams(window.location.search);
         const rawStatus = (searchParams.get("payment") || "").toLowerCase();
@@ -537,6 +545,37 @@
         paymentStatus.dataset.status = normalizedStatus;
         initialInterface.hidden = true;
         redirectResult.hidden = false;
+
+        const trackedRedirectKey = `payment-status:${window.location.search}`;
+
+        if (!sessionStorage.getItem(trackedRedirectKey)) {
+          const amount = Number(searchParams.get("amount"));
+          const label = searchParams.get("label") || "Aporte";
+          const baseParams = {
+            currency: "ARS",
+            payment_provider: "mercado_pago",
+            donation_label: label,
+          };
+
+          if (Number.isFinite(amount)) {
+            baseParams.value = amount;
+          }
+
+          if (normalizedStatus === "success") {
+            trackEvent("purchase", {
+              ...baseParams,
+              transaction_id: searchParams.get("payment_id") || undefined,
+            });
+          } else {
+            trackEvent("donation_checkout_result", {
+              ...baseParams,
+              status: normalizedStatus,
+            });
+          }
+
+          sessionStorage.setItem(trackedRedirectKey, "1");
+        }
+
         return true;
       }
 
@@ -579,6 +618,13 @@
           throw new Error("La respuesta no incluye una URL de checkout.");
         }
 
+        trackEvent("begin_checkout", {
+          currency: "ARS",
+          value: amount,
+          payment_provider: "mercado_pago",
+          donation_label: label,
+        });
+
         window.location.href = data.checkoutUrl;
       }
 
@@ -597,6 +643,14 @@
         `;
 
         button.addEventListener("click", async () => {
+          trackEvent("donation_click", {
+            currency: "ARS",
+            value: option.amount,
+            payment_provider: "mercado_pago",
+            donation_type: "preset",
+            donation_label: option.label,
+          });
+
           button.disabled = true;
           const previousHtml = button.innerHTML;
           button.innerHTML = `<span class="label">Procesando</span><span class="amount">...</span>`;
@@ -637,6 +691,14 @@
 
         setCustomHelpMessage("");
         setCustomLoadingState(true);
+
+        trackEvent("donation_click", {
+          currency: "ARS",
+          value: amount,
+          payment_provider: "mercado_pago",
+          donation_type: "custom",
+          donation_label: "Aporte libre",
+        });
 
         try {
           await createPreferenceAndRedirect(amount, "Aporte libre");
